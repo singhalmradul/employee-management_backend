@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.github.singhalmradul.dao.EmployeeDao;
 import io.github.singhalmradul.entity.Employee;
@@ -24,7 +26,9 @@ public class EmployeeController extends AbstractController<Employee, EmployeeDao
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         PrintWriter out = resp.getWriter();
         String pathInfo = req.getPathInfo();
         Map<String, String[]> reqParams = req.getParameterMap();

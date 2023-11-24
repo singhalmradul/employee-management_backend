@@ -6,48 +6,67 @@ import java.util.UUID;
 import org.hibernate.Session;
 
 import io.github.singhalmradul.entity.AbstractEntity;
-import jakarta.transaction.Transactional;
+import io.github.singhalmradul.utils.HibernateUtil;
 
 public class AbstractDao<E extends AbstractEntity> {
-    private Session session;
     private Class<E> entityClass;
 
-    /**
-     * @param session
-     */
-    public AbstractDao(Session session, Class<E> entityClass) {
-        this.session = session;
+    public AbstractDao(Class<E> entityClass) {
         this.entityClass = entityClass;
     }
 
-    @Transactional
     public UUID save(E entity) {
-        session.persist(entity);
-        return entity.getId();
-    }
-
-    @Transactional
-    public UUID update(E entity) {
-        session.merge(entity);
-        return entity.getId();
-    }
-
-    @Transactional
-    public UUID delete(UUID id) {
-        E entity = session.get(entityClass, id);
-        if (entity == null) {
-            throw new IllegalArgumentException(entityClass.getSimpleName() + " with id " + id + " not found");
+        try (Session session = HibernateUtil.getCurrentSession()) {
+            session.beginTransaction();
+            session.persist(entity);
+            session.getTransaction().commit();
+            return entity.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        session.remove(entity);
-        return entity.getId();
+    }
+
+    public UUID update(E entity) {
+        try (Session session = HibernateUtil.getCurrentSession()) {
+            session.beginTransaction();
+            session.merge(entity);
+            session.getTransaction().commit();
+            return entity.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public UUID delete(UUID id) {
+        try (Session session = HibernateUtil.getCurrentSession()) {
+            session.beginTransaction();
+            E entity = session.get(entityClass, id);
+            if (entity == null) {
+                throw new IllegalArgumentException(entityClass.getSimpleName() + " with id " + id + " not found");
+            }
+            session.beginTransaction();
+            session.remove(entity);
+            session.getTransaction().commit();
+            return entity.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public E getById(UUID id) {
-        return session.get(entityClass, id);
+        return HibernateUtil.getCurrentSession().get(entityClass, id);
     }
 
     public List<E> getAll() {
-        return session.createQuery("FROM " + entityClass.getSimpleName(), entityClass).getResultList();
-    }
 
+        Session session = HibernateUtil.getCurrentSession();
+        session.beginTransaction();
+        List<E> entites = session.createQuery("FROM " + entityClass.getSimpleName(), entityClass)
+                .getResultList();
+        session.getTransaction().commit();
+        return entites;
+    }
 }

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.github.singhalmradul.dao.AbstractDao;
 import io.github.singhalmradul.entity.AbstractEntity;
-import io.github.singhalmradul.utils.HibernateUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,20 +20,24 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class AbstractController<E extends AbstractEntity, D extends AbstractDao<E>>
         extends HttpServlet {
-    private Session session;
     protected transient D dao;
     private Class<D> daoClass;
     private Class<E> entityClass;
 
+    private static final String MIME_JSON = "application/json";
+    private static final String INVALID_REQUEST = "Invalid request";
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
+        resp.setContentType(MIME_JSON);
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         PrintWriter out = resp.getWriter();
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print(mapper.writeValueAsString("Invalid request"));
+            out.print(mapper.writeValueAsString(INVALID_REQUEST));
             out.flush();
             out.close();
             return;
@@ -66,8 +70,10 @@ public class AbstractController<E extends AbstractEntity, D extends AbstractDao<
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
+        resp.setContentType(MIME_JSON);
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         PrintWriter out = resp.getWriter();
         String pathInfo = req.getPathInfo();
         try {
@@ -95,13 +101,15 @@ public class AbstractController<E extends AbstractEntity, D extends AbstractDao<
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
+        resp.setContentType(MIME_JSON);
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         PrintWriter out = resp.getWriter();
         String pathInfo = req.getPathInfo();
         if (pathInfo != null && !pathInfo.equals("/")) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print(mapper.writeValueAsString("Invalid request"));
+            out.print(mapper.writeValueAsString(INVALID_REQUEST));
             out.flush();
             out.close();
             return;
@@ -127,13 +135,15 @@ public class AbstractController<E extends AbstractEntity, D extends AbstractDao<
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        ObjectMapper mapper = new ObjectMapper();
+        resp.setContentType(MIME_JSON);
+        ObjectMapper mapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
         PrintWriter out = resp.getWriter();
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print(mapper.writeValueAsString("Invalid request"));
+            out.print(mapper.writeValueAsString(INVALID_REQUEST));
             out.flush();
             out.close();
             return;
@@ -154,17 +164,9 @@ public class AbstractController<E extends AbstractEntity, D extends AbstractDao<
     }
 
     @Override
-    public void destroy() {
-        session.close();
-        super.destroy();
-    }
-
-    @Override
     public void init() throws ServletException {
-        super.init();
-        session = HibernateUtils.getInstance().getSession();
         try {
-            dao = daoClass.getConstructor(Session.class).newInstance(session);
+            dao = daoClass.getConstructor().newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }

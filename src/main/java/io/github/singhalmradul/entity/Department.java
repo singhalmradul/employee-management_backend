@@ -2,6 +2,10 @@ package io.github.singhalmradul.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,15 +21,29 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Department extends AbstractEntity {
 
-    @Column(name = "name", nullable = false)
-    private String name;
+        @Column(name = "name")
+        @JsonProperty("name")
+        private String name;
 
-    @OneToMany(mappedBy = "department", targetEntity = Entity.class, orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Entity> employees;
+        @Column(name = "location")
+        @JsonProperty("location")
+        private String location;
 
-    @OneToMany(mappedBy = "department", targetEntity = Announcement.class, orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Announcement> announcements;
+        @OneToMany(mappedBy = "department", targetEntity = Employee.class, orphanRemoval = true, cascade = {
+                        CascadeType.PERSIST,
+                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+        @JsonProperty("employees")
+        @JsonIgnore
+        private List<Employee> employees;
+
+        @OneToMany(mappedBy = "department", targetEntity = Announcement.class, orphanRemoval = true, cascade = {
+                        CascadeType.PERSIST,
+                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+        @JsonProperty("announcements")
+        @JsonIgnore
+        private List<Announcement> announcements;
 
 }

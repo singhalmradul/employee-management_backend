@@ -3,10 +3,13 @@ package io.github.singhalmradul.entity;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -18,19 +21,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Shift extends AbstractEntity {
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
     @Column(name = "start_time", columnDefinition = "TIME", nullable = false)
+    @JsonProperty("start_time")
     private LocalTime startTime;
 
     @Column(name = "end_time", columnDefinition = "TIME", nullable = false)
+    @JsonProperty("end_time")
     private LocalTime endTime;
 
-    @ManyToMany(targetEntity = Entity.class, mappedBy = "shifts")
-    @JoinTable(name = "employee_shifts", joinColumns = @JoinColumn(name = "shift_id"), inverseJoinColumns = @JoinColumn(name = "employee_id"))
-    private List<Entity> employees;
+    @ManyToMany(targetEntity = Entity.class, mappedBy = "shifts", cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE }, fetch = FetchType.LAZY)
+    @JsonProperty("employees")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true, value = { "shifts" })
+    private transient List<Employee> employees;
 
 }
