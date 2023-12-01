@@ -10,7 +10,7 @@ services:
     depends_on:
       - postgresql
   postgresql:
-    image: postgres:latest
+    image: postgres:15
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

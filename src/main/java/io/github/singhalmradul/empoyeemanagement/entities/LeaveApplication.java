@@ -2,9 +2,10 @@ package io.github.singhalmradul.empoyeemanagement.entities;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -22,14 +23,14 @@ public class LeaveApplication extends AbstractEntity {
         PENDING, APPROVED, REJECTED
     }
 
-    @ManyToOne(optional = false, targetEntity = Employee.class, cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, targetEntity = Employee.class, fetch = FetchType.EAGER)
     private Employee applicant;
 
     @Column(name = "reason", nullable = false)
     private String reason;
 
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING'")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(15) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))")
     private Status status;
 
     @Column(name = "end_date", columnDefinition = "DATE", nullable = false)
@@ -37,5 +38,17 @@ public class LeaveApplication extends AbstractEntity {
 
     @Column(name = "start_date", columnDefinition = "DATE", nullable = false)
     private LocalDate startDate;
+
+    public boolean isPending() {
+        return this.status == Status.PENDING;
+    }
+
+    public boolean isApproved() {
+        return this.status == Status.APPROVED;
+    }
+
+    public boolean isRejected() {
+        return this.status == Status.REJECTED;
+    }
 
 }

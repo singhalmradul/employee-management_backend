@@ -27,15 +27,12 @@ public class Department extends AbstractEntity {
         @Column(name = "location")
         private String location;
 
-        @OneToMany(mappedBy = "department", targetEntity = Employee.class, orphanRemoval = true, cascade = {
-                        CascadeType.PERSIST,
-                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "department", targetEntity = Employee.class, orphanRemoval = true, fetch = FetchType.LAZY)
         @JsonProperty("employees")
         private List<Employee> employees;
 
         @OneToMany(mappedBy = "department", targetEntity = Announcement.class, orphanRemoval = true, cascade = {
-                        CascadeType.PERSIST,
-                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+                        CascadeType.DETACH }, fetch = FetchType.LAZY)
         private List<Announcement> announcements;
 
 }

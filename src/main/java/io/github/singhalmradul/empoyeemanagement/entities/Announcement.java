@@ -2,7 +2,6 @@ package io.github.singhalmradul.empoyeemanagement.entities;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,8 +28,7 @@ public class Announcement extends AbstractEntity {
     @Column(name = "date", columnDefinition = "DATE", nullable = false)
     private LocalDate date;
 
-    @ManyToOne(optional = false, targetEntity = Department.class, cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, targetEntity = Department.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
     private Department department;
 

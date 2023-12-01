@@ -3,7 +3,6 @@ package io.github.singhalmradul.empoyeemanagement.entities;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,8 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Attendance extends AbstractEntity {
 
-    @ManyToOne(optional = false, targetEntity = Employee.class, cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, targetEntity = Employee.class, fetch = FetchType.EAGER,inv)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 

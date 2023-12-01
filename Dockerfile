@@ -2,7 +2,7 @@ FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app/
 
 COPY pom.xml /app/pom.xml
-COPY ./src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplicationTests.java /app/src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplicationTests.java
+COPY ./src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplication.java /app/src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplication.java
 
 RUN mvn -f /app/pom.xml clean package
 

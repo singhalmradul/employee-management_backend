@@ -3,7 +3,6 @@ package io.github.singhalmradul.empoyeemanagement.entities;
 import java.time.LocalTime;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,8 +25,7 @@ public class Shift extends AbstractEntity {
     @Column(name = "end_time", columnDefinition = "TIME", nullable = false)
     private LocalTime endTime;
 
-    @ManyToMany(targetEntity = Entity.class, mappedBy = "shifts", cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Entity.class, mappedBy = "shifts", fetch = FetchType.LAZY)
     private transient List<Employee> employees;
 
 }

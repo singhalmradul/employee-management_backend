@@ -54,20 +54,19 @@ public class Employee extends AbstractEntity {
         private LocalDate hireDate;
 
         @ManyToOne(optional = false, targetEntity = Department.class, fetch = FetchType.EAGER, cascade = {
-                        CascadeType.PERSIST, CascadeType.MERGE })
+                        CascadeType.PERSIST })
         @JoinColumn(name = "department_id")
         private Department department;
 
-        @ManyToMany(targetEntity = Meeting.class, cascade = { CascadeType.PERSIST,
-                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+        @ManyToMany(targetEntity = Meeting.class, fetch = FetchType.LAZY)
         @JoinTable(name = "meeting_attendees", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "meeting_id"))
         private List<Meeting> meetings;
 
-        @OneToMany(mappedBy = "employee", targetEntity = Attendance.class, orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        @OneToMany(mappedBy = "employee", targetEntity = Attendance.class, orphanRemoval = true, cascade = {
+                        CascadeType.DETACH }, fetch = FetchType.LAZY)
         private List<Attendance> attendace;
 
-        @ManyToMany(targetEntity = Shift.class, cascade = { CascadeType.PERSIST,
-                        CascadeType.MERGE }, fetch = FetchType.LAZY)
+        @ManyToMany(targetEntity = Shift.class, fetch = FetchType.LAZY)
         @JoinTable(name = "employee_shifts", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "shift_id"))
         private List<Shift> shifts;
 

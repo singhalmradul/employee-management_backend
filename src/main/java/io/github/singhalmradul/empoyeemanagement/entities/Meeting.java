@@ -51,8 +51,7 @@ public class Meeting extends AbstractEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @ManyToMany(targetEntity = Employee.class, cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = Employee.class, cascade = { CascadeType.PERSIST }, fetch = FetchType.LAZY)
     @JoinTable(name = "meeting_attendees", joinColumns = @JoinColumn(name = "meeting_id"), inverseJoinColumns = @JoinColumn(name = "employee_id"))
     private List<Employee> attendees;
 
@@ -70,4 +69,15 @@ public class Meeting extends AbstractEntity {
         }
     }
 
+    public boolean isPending() {
+        return this.getStatus() == Status.PENDING;
+    }
+
+    public boolean isOngoing() {
+        return this.getStatus() == Status.ONGOING;
+    }
+
+    public boolean isCompleted() {
+        return this.getStatus() == Status.COMPLETED;
+    }
 }
