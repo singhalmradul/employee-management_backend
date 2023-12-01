@@ -1,13 +1,15 @@
-# Stage 1: Build the application
-FROM maven:latest AS build
-WORKDIR /app
-# Copy pom.xml and download dependencies first to leverage Docker caching
-COPY ./pom.xml ./pom.xml
-RUN mvn dependency:go-offline
-# Copy source code and build the application
-COPY ./src ./src
-RUN mvn package
+FROM maven:3.8.4-openjdk-17 AS build
+WORKDIR /app/
 
-# Stage 2: Deploy the application
-FROM tomcat:latest
-COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/
+COPY pom.xml /app/pom.xml
+COPY ./src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplicationTests.java /app/src/main/java/io/github/singhalmradul/empoyeemanagement/EmpoyeeManagementApplicationTests.java
+
+RUN mvn -f /app/pom.xml clean package
+
+COPY . /app/
+RUN mvn -f /app/pom.xml clean package
+
+FROM openjdk:17-jdk-alpine
+EXPOSE 8080
+COPY --from=build /app/target/*.jar /app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
