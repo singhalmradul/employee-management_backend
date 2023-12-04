@@ -1,9 +1,11 @@
 package io.github.singhalmradul.empoyeemanagement.entities;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,24 +13,30 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "meeting")
 @Getter
 @Setter
-@NoArgsConstructor
-public class Meeting extends AbstractEntity {
+public class Meeting {
 
     public enum Status {
         PENDING, COMPLETED, ONGOING
     }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private UUID id;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -47,9 +55,6 @@ public class Meeting extends AbstractEntity {
 
     @Column(name = "location", nullable = false)
     private String location;
-
-    @Column(name = "status", nullable = false)
-    private String status;
 
     @ManyToMany(targetEntity = Employee.class, cascade = { CascadeType.PERSIST }, fetch = FetchType.LAZY)
     @JoinTable(name = "meeting_attendees", joinColumns = @JoinColumn(name = "meeting_id"), inverseJoinColumns = @JoinColumn(name = "employee_id"))
@@ -79,5 +84,9 @@ public class Meeting extends AbstractEntity {
 
     public boolean isCompleted() {
         return this.getStatus() == Status.COMPLETED;
+    }
+
+    public Duration getDuration() {
+        return Duration.between(this.startTime, this.endTime);
     }
 }
